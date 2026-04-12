@@ -1,0 +1,129 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+    --primary: rgb(255, 180, 3);
+    --primaryTransp: rgba(255, 180, 3, 0.25);
+    --secondary: rgb(128, 128, 128);
+    --info: rgb(15, 206, 0);
+    --danger: rgb(255, 0, 0);
+    --cont: rgb(255,255,255);
+    --contTransp: rgba(255,255,255,0.25);
+    --text: rgb(0,0,0);
+    --bg: rgb(255,255,255);
+}
+
+[data-theme="dark"] {
+    --text: rgb(255,255,255);
+    --bg: rgb(20, 16, 11);
+    --cont: rgb(255,255,255);
+    --same: rgb(0,0,0);
+}
+
+[data-theme="light"] {
+    --text: rgb(0,0,0);
+    --bg: rgb(255,255,255);
+    --cont: rgb(0,0,0);
+    --contTransp: rgba(0,0,0,0.25);
+    --same: rgb(255,255,255);
+}
+
+
+
+
+body {
+    color: var(--text);
+    background-color: var(--bg);
+    font-family: "SN pro";
+}
+
+html {
+    scrollbar-width: none;
+}
+
+html,body,div {
+    transition: 0.5s;
+}
+
+.image {
+    filter: hue-rotate(-10deg) drop-shadow(0px 0px 100px var(--primary)) saturate(0.9);
+}
+
+.editor * {
+  color: var(--cont);  
+}
+
+.mdxeditor-toolbar * {
+   color: white;
+}
+
+.editor {
+    overflow-y: scroll;
+    line-height: 15px;
+    --accentBase: var(--tomato-1);
+    --accentBgSubtle: var(--tomato-2);
+    --accentBg: var(--tomato-3);
+    --accentBgHover: var(--tomato-4);
+    --accentBgActive: var(--tomato-5);
+    --accentLine: var(--tomato-6);
+    --accentBorder: var(--tomato-7);
+    --accentBorderHover: var(--tomato-8);
+    --accentSolid: var(--tomato-9);
+    --accentSolidHover: var(--tomato-10);
+    --accentText: var(--tomato-11);
+    --accentTextContrast: var(--tomato-12);
+    --baseBase: var(--mauve-1);
+    --baseBgSubtle: var(--mauve-2);
+    --baseBg: rgb(255, 180, 3);
+    --baseBgActive: green;
+    --baseBgHover: var(--mauve-4);
+    --baseBgActive: var(--mauve-5);
+    --baseLine: var(--mauve-6);
+    --baseBorder: var(--mauve-7);
+    --baseBorderHover: var(--mauve-8);
+    --baseSolid: var(--mauve-9);
+    --baseSolidHover: var(--mauve-10);
+    --baseTextContrast: var(--mauve-12);
+    --admonitionTipBg: var(--cyan4);
+    --admonitionTipBorder: var(--cyan8);
+    --admonitionInfoBg: var(--grass4);
+    --admonitionInfoBorder: var(--grass8);
+    --admonitionCautionBg: var(--amber4);
+    --admonitionCautionBorder: var(--amber8);
+    --admonitionDangerBg: var(--red4);
+    --admonitionDangerBorder: var(--red8);
+    --admonitionNoteBg: var(--mauve-4);
+    --admonitionNoteBorder: var(--mauve-8);
+    --baseText: rgb(255,255,255);
+    font-family: 'SN Pro', sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    color: rgb(255,255,255);
+    --basePageBg: rgb(255, 186, 26);
+    border-radius: 10px;
+    box-shadow: 0 0 3px var(--contTransp);
+    max-height: calc(50px + 60vh);
+    height:100% !important;
+}
+
+[role="textbox"] {
+    height: 100% !important;
+    
+}
+
+.mdxeditor-root-contenteditable {
+    height: 100% !important;
+}
+
+.mdxeditor-root-contenteditable div {
+    height: 100% !important;
+}
+
+
+/* sn-pro-regular - latin */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'SN Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: url('/fonts/sn-pro-v1-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}

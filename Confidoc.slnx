@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="confidoc.client/confidoc.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="Confidoc.Server/Confidoc.Server.csproj" />
+  <Project Path="ConfidocLib/ConfidocLib.csproj" Id="30cbc51e-f3b1-4073-bda5-7050ee34748f" />
+  <Project Path="ConfidocTests/ConfidocTests.csproj" Id="b5e6cd87-2938-45ab-9009-0c6b1f21860d" />
+</Solution>

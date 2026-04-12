@@ -1,0 +1,196 @@
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace ConfidocLib
+{
+    public class KeyPair
+    {
+        public string? PublicKey { get; set; }
+        public string? PrivateKey { get; set; }
+    }
+
+    public static class Security
+    {
+        /// <summary>
+        /// Generates a SHA256 hash from the input data
+        /// and a salt.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] Hash(string data)
+        {
+            var salt = "||.ConfiDocSalt.||";
+            try
+            {
+                var firstPart = string.Join("", data.Take(data.Length/2));
+                var lastPart  = string.Join("", data.TakeLast(data.Length/2).Reverse());
+                data = $"{firstPart}{salt}{lastPart}";
+            }catch
+            {
+                data = $"{salt}{data}";
+            }
+            return SHA256.HashData(Encoding.UTF8.GetBytes(data));
+        }
+
+        /// <summary>
+        /// Generates a SHA256 hash from the input data
+        /// and a salt.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string HashString(string data)
+        {
+            var salt = "||.ConfiDocSalt.||";
+            try
+            {
+                var firstPart = string.Join("", data.Take(data.Length/2));
+                var lastPart  = string.Join("", data.TakeLast(data.Length/2).Reverse());
+                data = $"{firstPart}{salt}{lastPart}";
+            }catch
+            {
+                data = $"{salt}{data}";
+            }
+            return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(data)));
+        }
+
+        /// <summary>
+        /// Generates an ECDSA PEM keypair.
+        /// </summary>
+        /// <returns></returns>
+        public static KeyPair GenerateKeyPair()
+        {
+            var ecdsa = ECDsa.Create();
+            return new() {
+                PublicKey = ecdsa.ExportSubjectPublicKeyInfoPem(),
+                PrivateKey = ecdsa.ExportECPrivateKeyPem(),
+            };
+        }
+
+        /// <summary>
+        /// Aes encryption
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string Encrypt(string data, string password)
+        {
+            using var aes = Aes.Create();
+            aes.Key = Hash(password);
+            var encrypter = aes.CreateEncryptor();
+
+            StringBuilder final = new();
+            final.Append($"{Convert.ToBase64String(aes.IV)}.");
+
+            byte[] encrypted;
+            using (MemoryStream ms = new())
+            {
+                using (CryptoStream cs = new(ms, encrypter, CryptoStreamMode.Write))
+                {
+                    using (StreamWriter sw = new(cs))
+                        sw.Write(data); 
+                }
+                encrypted = ms.ToArray();
+            }
+
+            final.Append(Convert.ToBase64String(encrypted));
+            return final.ToString();
+        } 
+
+        /// <summary>
+        /// Aes decryption
+        /// </summary>
+        /// <param name="cipherText"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string Decrypt(string cipherText, string password)
+        {
+            if (cipherText.Length == 0) return cipherText;
+            
+            using var aes = Aes.Create();
+            var sections = cipherText.Split(".");
+            var cipherData = Convert.FromBase64String(sections[1]);
+            aes.Key = Hash(password);
+            aes.IV = Convert.FromBase64String(sections[0]);
+            var decryptor = aes.CreateDecryptor();
+
+            string? decrypted;
+            using (MemoryStream ms = new(cipherData))
+            {
+                using (CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read))
+                {
+                    using (StreamReader sw = new(cs))
+                        decrypted = sw.ReadToEnd();
+                }
+            }
+
+            return decrypted;
+
+        } 
+
+        /// <summary>
+        /// Generates an encrypted representation 
+        /// of the keypair such that a password
+        /// is required to retrieve the keypair.
+        /// </summary>
+        /// <param name="keyPair"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string EncryptKeyPair(KeyPair keyPair, string password)
+            => Encrypt(JsonConvert.SerializeObject(keyPair), password);
+        
+
+        /// <summary>
+        /// Decrypts a keypair ciphertext generated by <see cref="EncryptKeyPair(KeyPair, string)"/>.
+        /// </summary>
+        /// <param name="cipherText"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static KeyPair? DecryptKeyPair(string cipherText, string password)
+            => JsonConvert.DeserializeObject<KeyPair>(Decrypt(cipherText, password));
+        
+
+        /// <summary>
+        /// Generates a base64 encoded ECDSA signature based on the 
+        /// hash of the inputted data and the keypair provided.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="keyPair"></param>
+        /// <returns></returns>
+        public static string Sign(string data, string privateKeyPem) {
+            var ecdsa = ECDsa.Create();
+            ecdsa.ImportFromPem(privateKeyPem);
+
+            var hash = Hash(data);
+            var signatureBytes = ecdsa.SignHash(hash);
+            var signatureBase64 = Convert.ToBase64String(signatureBytes);
+            return signatureBase64;
+        }
+
+
+        /// <summary>
+        /// Validates if an ECDSA signature is valid or not.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="signature"></param>
+        /// <param name="keyPair"></param>
+        /// <returns></returns>
+        public static bool ValidSignature(string data, string signatureBase64, string publicKeyPem)
+        {
+            try
+            {
+                var ecdsa = ECDsa.Create();
+                ecdsa.ImportFromPem(publicKeyPem);
+
+                var hash = Hash(data);
+                var signatureBytes = Convert.FromBase64String(signatureBase64);
+                return ecdsa.VerifyHash(hash, signatureBytes);
+            } catch { return false;  }
+
+        }
+    }
+}
