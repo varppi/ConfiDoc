@@ -57,7 +57,7 @@ export async function setPassword(id: string, password: string) {
         text: password
     }, getConfig());
     const hash = resp.data.hash;
-    let passwords = getPasswords()
+    const passwords = getPasswords()
         .filter(x => x.id != id)
         .concat({id, password: hash});
     localStorage.setItem("passwords", JSON.stringify(passwords));
@@ -74,6 +74,13 @@ export function getConfig(): AxiosRequestConfig {
 
 export function isLoggedIn(): boolean {
     return !(getToken() == null || getToken() == "");
+}
+
+export async function isSetup() {
+    const resp = await axios.get("/api/setup", getConfig());
+    if (!resp.data.hasAdmin)
+        return false;
+    return true;
 }
 
 // Helpers

@@ -165,7 +165,7 @@ public partial class Actions
         if (GetUserGroups(user).Any(group => document!.WriteAccessGroups!.Any(g => g.Name == group)))
             access = 2;
         
-        if (document.Owner == user)
+        if (document.Owner == user || roles.Contains("admin"))
             access = 3;
         return access;
     }
@@ -198,6 +198,7 @@ public partial class Actions
         return access;
     }
     #endregion Access
+
 
     #region Groups
 
@@ -515,6 +516,8 @@ public partial class Actions
 
         _context.Documents.Where(document => document.OwnerId == user.Id).ExecuteDelete();
         _context.Roles.Where(role => role.OwnerId == user.Id).ExecuteDelete();
+        var userRoles = await _userManager.GetRolesAsync(user);
+        await _userManager.RemoveFromRolesAsync(user, userRoles);
         user.UserName = $"delete_user_{Guid.NewGuid().ToString().Replace("-", "").Substring(0, 10)}";
         var randomBytes = new byte[1024];
         new Random().NextBytes(randomBytes);

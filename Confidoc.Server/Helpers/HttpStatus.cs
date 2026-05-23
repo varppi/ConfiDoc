@@ -38,6 +38,14 @@ namespace Confidoc.Server.Helpers
 
         public static readonly IActionResult Login = new RedirectResult("/login");
 
+        public static readonly IActionResult BadRequest = new JsonResult(new
+        {
+            Message = "bad request. make sure all fields are correctly filled."
+        })
+        {
+            StatusCode = 400
+        };
+
         public static readonly IActionResult NotFoundAllowed = new JsonResult(new
         {
             Message = "not found or no read permissions"

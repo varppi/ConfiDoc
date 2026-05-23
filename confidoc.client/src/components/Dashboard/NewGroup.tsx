@@ -11,12 +11,12 @@ function NewGroup() {
     const navigate = useNavigate();
 
     async function submit(form: FormData) {
-        const name: string = form.get("name")?.toString()??"untitled document";
+        const name: string = form.get("name")?.toString()??"untitled group";
         try {
             const resp = await axios.post("/api/group/new", {
                 name,
             }, getConfig())
-            setMessage(<Message color="info" text="document created" />);
+            setMessage(<Message color="info" text="group created" />);
             setTimeout(() => {
                 navigate(`/group/${resp.data.id}`);
             }, 2000);

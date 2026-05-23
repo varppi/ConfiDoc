@@ -1,5 +1,5 @@
 import { Flag01 } from "@untitledui/icons";
-import { getToken } from "../globals";
+import { getToken, isSetup } from "../globals";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
  
@@ -7,6 +7,11 @@ function Home() {
     const navigate = useNavigate();
 
     useEffect(() => {
+
+        isSetup().then(hasAdmin => {
+            if (!hasAdmin) navigate("/setup");
+        })
+
         const token = getToken();
         if (token != null && token.length > 5) {
             navigate("/dashboard")

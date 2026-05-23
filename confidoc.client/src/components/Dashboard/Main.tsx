@@ -59,7 +59,9 @@ function Main() {
     <main>
       <h1 className="text-4xl text-[var(--cont)] font-bold max-md:mt-5 mb-5
                       uppercase underline decoration-[var(--primary)] decoration-[3px]"
-      >Dashboard</h1>
+          >Dashboard</h1>
+
+      <p className="mt-5 text-xl uppercase">Activity graph</p>
       <div className="w-full h-full bg-[var(--primary)]/5 rounded-2xl max-w-[1000px]">
         <BarChart
           sx={{

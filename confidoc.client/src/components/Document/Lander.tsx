@@ -171,12 +171,12 @@ function Lander() {
     }, [verify]);
 
     useEffect(() => {
-        getDocument().then(doc => {
-            setDocument(doc);
-        });
         getGroups().then(groups => {
             setGroups(groups);
         })
+        getDocument().then(doc => {
+            setDocument(doc);
+        });
     }, [reloadDocument])
 
     return (

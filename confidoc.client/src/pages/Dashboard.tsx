@@ -23,7 +23,6 @@ export default function Dashboard() {
 
     function changeView(path: string) {
         navigate(path);
-//        setView(element);
         setShowMenu(false);
     }
 

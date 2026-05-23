@@ -10,6 +10,18 @@ public partial class Actions
     private readonly UserManager<ConfidocUser> _userManager;
     private readonly RoleManager<ConfidocRole> _roleManager;
 
+    public async void Initialize()
+    {
+        try
+        {
+            await _roleManager.CreateAsync(new ConfidocRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "admin"
+            });
+            _context.SaveChanges();
+        }catch { }
+    }
 
     public Actions(
         ApplicationDbContext context,
@@ -20,6 +32,7 @@ public partial class Actions
         _context     = context;
         _userManager = userManager;
         _roleManager = roleManager;
+        Initialize();
     }
 }
 

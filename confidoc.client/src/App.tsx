@@ -15,6 +15,7 @@ import Documents from "./components/Dashboard/Documents";
 import Groups from "./components/Dashboard/Groups";
 import NewGroup from "./components/Dashboard/NewGroup";
 import Main from "./components/Dashboard/Main";
+import Setup from "./pages/Setup";
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Routes>
             <Route path="/" element={<Layout />} >
                 <Route index element={<Home />} />
+                <Route path="/setup" element={<Setup/> }/>
                 <Route path="/login" element={<Login />} /> 
                 <Route path="/register" element={<Register />} />
                 <Route path="/logout" element={<LogOut/>} />
