@@ -162,6 +162,30 @@ namespace Confidoc.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Grants",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Ends = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Starts = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    GranteeId = table.Column<string>(type: "TEXT", nullable: true),
+                    Level = table.Column<int>(type: "INTEGER", nullable: true),
+                    Receiver = table.Column<string>(type: "TEXT", nullable: true),
+                    ReceiverType = table.Column<string>(type: "TEXT", nullable: true),
+                    ResourceType = table.Column<string>(type: "TEXT", nullable: true),
+                    ResourceId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Grants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Grants_AspNetUsers_GranteeId",
+                        column: x => x.GranteeId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Changes",
                 columns: table => new
                 {
@@ -264,6 +288,11 @@ namespace Confidoc.Server.Migrations
                 table: "Documents",
                 column: "OwnerId");
 
+            migrationBuilder.CreateIndex(
+                name: "IX_Grants_GranteeId",
+                table: "Grants",
+                column: "GranteeId");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                 table: "AspNetRoleClaims",
@@ -356,6 +385,9 @@ namespace Confidoc.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Changes");
+
+            migrationBuilder.DropTable(
+                name: "Grants");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

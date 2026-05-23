@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Confidoc.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260320071220_ApplicationDbContextMigration")]
+    [Migration("20260523112437_ApplicationDbContextMigration")]
     partial class ApplicationDbContextMigration
     {
         /// <inheritdoc />
@@ -200,6 +200,42 @@ namespace Confidoc.Server.Migrations
                     b.ToTable("Documents");
                 });
 
+            modelBuilder.Entity("Confidoc.Server.Models.Grant", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Ends")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GranteeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Level")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Receiver")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReceiverType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ResourceId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ResourceType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Starts")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GranteeId");
+
+                    b.ToTable("Grants");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -350,6 +386,15 @@ namespace Confidoc.Server.Migrations
                         .HasForeignKey("OwnerId");
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("Confidoc.Server.Models.Grant", b =>
+                {
+                    b.HasOne("Confidoc.Server.Models.ConfidocUser", "Grantee")
+                        .WithMany()
+                        .HasForeignKey("GranteeId");
+
+                    b.Navigation("Grantee");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

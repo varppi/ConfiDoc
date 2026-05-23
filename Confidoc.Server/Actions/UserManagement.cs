@@ -18,49 +18,61 @@ public partial class Actions
     /// <summary>
     /// Adds read access to a document for the specified group.
     /// </summary>
+    /// <param name="grantee"></param>
     /// <param name="group"></param>
     /// <param name="id"></param>
-    public void AddDocumentWriteAccess(ConfidocRole group, string id)
+    /// <param name="duration"></param>
+    public void AddDocumentWriteAccess(ClaimsPrincipal grantee, ConfidocRole group, string id, double duration=1)
     {
         var document = GetDocumentByID(id);
-        AddDocumentReadAccess(group, id);
+        if (group is null || group.Id is null) return;
+        CreateGroupDocumentGrant(grantee, group.Name, id, 2, duration).Wait();
         document!.WriteAccessGroups!.Add(group);
         _context.SaveChanges();
-    } 
+    }
 
     /// <summary>
     /// Adds read access to a document for the specified group.
     /// </summary>
+    /// <param name="grantee"></param>
     /// <param name="group"></param>
     /// <param name="id"></param>
-    public void AddDocumentWriteAccess(ConfidocUser user, string id)
+    /// <param name="duration"></param>
+    public void AddDocumentWriteAccess(ClaimsPrincipal grantee, ConfidocUser user, string id, double duration=1)
     {
         var document = GetDocumentByID(id);
-        AddDocumentReadAccess(user, id);
+        if (user is null || user.UserName is null) return;
+        CreateUserDocumentGrant(grantee, user.UserName, id, 2, duration);
         document!.WriteAccessUsers!.Add(user);
         _context.SaveChanges();
-    } 
+    }
 
     /// <summary>
     /// Adds read access to a document for the specified user.
     /// </summary>
+    /// <param name="grantee"></param>
     /// <param name="user"></param>
     /// <param name="id"></param>
-    public void AddDocumentReadAccess(ConfidocRole group, string id)
+    public void AddDocumentReadAccess(ClaimsPrincipal grantee, ConfidocRole group, string id, double duration=1)
     {
         var document = GetDocumentByID(id);
+        if (group is null || group.Name is null) return;
+        CreateGroupDocumentGrant(grantee, group.Name, id, 1, duration).Wait();
         document!.ReadAccessGroups!.Add(group);
         _context.SaveChanges();
-    } 
+    }
 
     /// <summary>
     /// Adds read access to a document for the specified user.
     /// </summary>
+    /// <param name="grantee"></param>
     /// <param name="user"></param>
     /// <param name="id"></param>
-    public void AddDocumentReadAccess(ConfidocUser user, string id)
+    public void AddDocumentReadAccess(ClaimsPrincipal grantee, ConfidocUser user, string id, double duration=1)
     {
         var document = GetDocumentByID(id);
+        if (user is null || user.UserName is null) return;
+        CreateUserDocumentGrant(grantee, user.UserName, id, 1, duration);
         document!.ReadAccessUsers!.Add(user);
         _context.SaveChanges();
     } 
@@ -79,6 +91,7 @@ public partial class Actions
         document!.WriteAccessGroups = document.ReadAccessGroups!
             .Where(wGroup => wGroup.Name != group.Name)
             .ToList();
+        _context.Grants.Where(g => g.Receiver == group.Name && g.ResourceId == id).ExecuteDelete();
         _context.SaveChanges();
     } 
 
@@ -96,6 +109,7 @@ public partial class Actions
         document!.WriteAccessUsers = document.WriteAccessUsers!
             .Where(rUser => rUser.UserName != user.UserName)
             .ToList();
+        _context.Grants.Where(g => g.Receiver == user.UserName && g.ResourceId == id).ExecuteDelete();
         _context.SaveChanges();
     } 
 
@@ -141,6 +155,8 @@ public partial class Actions
         // level 3 = owner
         int access = 0;
 
+        SyncDocuments();
+        
         // has read access?
         var parsedDocument = ToParsedDocuments([document])[0];
         if ((parsedDocument.ReadAccessUsers ?? []).Contains("anonymous"))
@@ -164,7 +180,13 @@ public partial class Actions
             access = 2;
         if (GetUserGroups(user).Any(group => document!.WriteAccessGroups!.Any(g => g.Name == group)))
             access = 2;
-        
+
+        var grantLevel = GrantLevelForDocument(user, document.Id ?? "");
+        if (grantLevel is null)
+            access = 0;
+        else
+            access = grantLevel??0;
+
         if (document.Owner == user || roles.Contains("admin"))
             access = 3;
         return access;
@@ -246,7 +268,7 @@ public partial class Actions
     {
         var user = GetUser(claim);
         if (user is null) throw Exceptions.Null;
-        var role = await _roleManager.FindByNameAsync(group);
+        var role = await _roleManager.FindByIdAsync(group);
         if (role is null) throw Exceptions.Null;
         var parsedGroup = await ToParsedGroup(role);
         if (GroupAccessLevel(user, group) < 1)

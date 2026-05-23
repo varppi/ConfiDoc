@@ -21,7 +21,7 @@
 - [X] Digital signing with ECDSA.
 - [X] AES-256 bit cold storage encryption.
 - [x] Admin accounts
-- [ ] Access periods ("allow access for X days").
+- [x] Access periods ("allow access for X days").
 - [ ] Read only PDF view.
 - [ ] Tracking information in read only mode, making each download linked to the IP and account of the user.
 - [ ] Captcha.

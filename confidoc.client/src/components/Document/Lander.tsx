@@ -88,10 +88,12 @@ function Lander() {
     async function AddUserAccess(form: FormData) {
         const name = form.get("name");
         const level = form.get("level");
+        const duration = form.get("duration");
         try {
             const resp = await axios.post(`/api/document/${id}/add/user`, {
                 name,
-                level
+                level,
+                duration
             }, getConfig());
             setReloadDocument(!reloadDocument);
             return resp.data;
@@ -108,10 +110,12 @@ function Lander() {
     async function AddGroupAccess(form: FormData) {
         const name = form.get("name");
         const level = form.get("level");
+        const duration = form.get("duration");
         try {
             const resp = await axios.post(`/api/document/${id}/add/group`, {
                 name,
-                level
+                level,
+                duration
             }, getConfig());
             setReloadDocument(!reloadDocument);
             return resp.data;
@@ -299,23 +303,36 @@ function Lander() {
                                     )
                                 }
                             </div>
-                            <form className="flex gap-3 rounded-2xl"
+                            <form className="flex gap-2 rounded2xl"
                                 action={AddUserAccess}>
                                 <input 
                                     placeholder="username" 
                                     name="name"
-                                    className="border-2 border-[var(--primary)] outline-none 
-                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/25 text-xl p-2 
+                                    className="border-1 border-[var(--primary)] outline-none 
+                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-2 
                                             rounded-xl w-full"/>
-                                <select className="border-2 border-[var(--primary)] outline-none 
-                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/25 text-xl p-1
+                                <select className="border-1 border-[var(--primary)] outline-none 
+                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
                                             rounded-xl w-fit font-semibold"
                                         name="level">
                                         <option value={"read"}>READ</option>
                                         <option value={"write"}>READ & WRITE</option>
                                 </select>
+                                <select className="border-1 border-[var(--primary)] outline-none
+                                        focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
+                                        rounded-xl w-fit font-semibold"
+                                    name="duration">
+                                        <option value={"1"}>1h</option>
+                                        <option value={"8"}>8h</option>
+                                        <option value={"24"}>1d</option>
+                                        <option value={24 * 7}>7d</option>
+                                        <option value={24 * 30}>30d</option>
+                                        <option value={24 * 180}>180 days</option>
+                                        <option value={24 * 360}>year</option>
+                                </select>
                                 <button className="rounded-xl bg-[var(--primary)] p-3 uppercase min-w-[calc(150px+0.25vw)]
                                                 font-semibold hover:shadow-[0_0_5px_var(--primary)]">Add</button>
+                                
                             </form>
 
 
@@ -355,10 +372,10 @@ function Lander() {
                                     )
                                 }
                             </div>
-                            <form className="flex gap-3 rounded-2xl"
+                            <form className="flex gap-2 rounded-2xl"
                                 action={AddGroupAccess}>
-                                <select className="border-2 border-[var(--primary)] outline-none 
-                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/25 text-xl p-2 
+                                <select className="border-1 border-[var(--primary)] outline-none 
+                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-2 
                                             rounded-xl w-full"
                                         name="name">
                                         {
@@ -366,12 +383,24 @@ function Lander() {
                                             groups.map(group => <option value={group.id}>{group.displayName}</option>)
                                         }
                                 </select>
-                                <select className="border-2 border-[var(--primary)] outline-none 
-                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/25 text-xl p-1
+                                <select className="border-1 border-[var(--primary)] outline-none 
+                                            focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
                                             rounded-xl w-fit font-semibold"
                                         name="level">
                                         <option value={"read"}>READ</option>
                                         <option value={"write"}>READ & WRITE</option>
+                                </select>
+                                <select className="border-1 border-[var(--primary)] outline-none
+                                    focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
+                                    rounded-xl w-fit font-semibold"
+                                    name="duration">
+                                    <option value={"1"}>1h</option>
+                                    <option value={"8"}>8h</option>
+                                    <option value={"24"}>1d</option>
+                                    <option value={24 * 7}>7d</option>
+                                    <option value={24 * 30}>30d</option>
+                                    <option value={24 * 180}>180 days</option>
+                                    <option value={24 * 360}>year</option>
                                 </select>
                                 <button className="rounded-xl bg-[var(--primary)] p-3 uppercase min-w-[calc(150px+0.25vw)]
                                                 font-semibold hover:shadow-[0_0_5px_var(--primary)]">Add</button>

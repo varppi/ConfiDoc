@@ -30,6 +30,22 @@ namespace Confidoc.Server.Controllers
         }
 
         //[HttpGet]
+        //[Route("/test")]
+        //public async Task<IActionResult> Get(string? id)
+        //{
+        //    if (id is not null) _actions.CreateUserDocumentGrant(User, "fff", id, 1, .01);
+        //    return new JsonResult(_actions.GetGrants());
+        //}
+
+        //[HttpGet]
+        //[Route("/test2")]
+        //public async Task<IActionResult> Get2(string? id)
+        //{
+        //    if (id is not null) return new JsonResult(_actions.GrantLevelForDocument(User, id));
+        //    return new JsonResult(_actions.GetGrants());
+        //}
+
+        //[HttpGet]
         //[Route("/testss")]
         //public async Task<string> Get()
         //{

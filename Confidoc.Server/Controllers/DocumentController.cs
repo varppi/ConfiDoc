@@ -50,6 +50,8 @@ namespace Confidoc.Server.Controllers
             public string? Name { get; set; }
             [Required]
             public string? Level { get; set; }
+            [Required]
+            public double? Duration { get; set; }
         }
 
         private readonly SignInManager<ConfidocUser> _signInManager;
@@ -174,10 +176,10 @@ namespace Confidoc.Server.Controllers
             switch(req.Level)
             {
                 case "read":
-                    _actions.AddDocumentReadAccess(user, id);
+                    _actions.AddDocumentReadAccess(User, user, id, (double)(req.Duration ?? 0));
                     break;
                 case "write":
-                    _actions.AddDocumentWriteAccess(user, id);
+                    _actions.AddDocumentWriteAccess(User, user, id, (double)(req.Duration ?? 0));
                     break;
             }
             return HttpStatus.Ok;
@@ -194,10 +196,10 @@ namespace Confidoc.Server.Controllers
             switch(req.Level)
             {
                 case "read":
-                    _actions.AddDocumentReadAccess(group, id);
+                    _actions.AddDocumentReadAccess(User, group, id, (double)(req.Duration??0));
                     break;
                 case "write":
-                    _actions.AddDocumentWriteAccess(group, id);
+                    _actions.AddDocumentWriteAccess(User, group, id, (double)(req.Duration??0));
                     break;
             }
             return HttpStatus.Ok;
