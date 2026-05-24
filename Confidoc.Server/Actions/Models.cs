@@ -23,6 +23,7 @@ public class ParsedChange
 public class ParsedDocument
 {
     public string? Id { get; set; }
+    public int? Level { get; set; }
     public string? Name { get; set; }
     public IEnumerable<ParsedChange>? Changes { get; set; }
     public string? Data { get; set; }
@@ -30,10 +31,26 @@ public class ParsedDocument
     public long? LastModified { get; set; }
     public string? Owner { get; set; }
     public string? Encrypted { get; set; }
+    public IEnumerable<ParsedGrant> Grants { get; set; }
     public IEnumerable<string>? ReadAccessUsers { get; set; }
     public IEnumerable<string>? WriteAccessUsers { get; set; }
     public IEnumerable<string>? ReadAccessGroups { get; set; }
     public IEnumerable<string>? WriteAccessGroups { get; set; }
+}
+
+public class ParsedGrant
+{
+    public string? Id { get; set; }
+    public bool Expired { get; set; }
+    public long? Ends { get; set; }
+    public long? Starts { get; set; }
+    public int? MinutesLeft { get; set; }
+    public string? Grantee { get; set; }
+    public string? Receiver { get; set; }
+    public int? Level { get; set; }
+    public string? ReceiverType { get; set; }
+    public string? ResourceType { get; set; }
+    public string? ResourceId { get; set; }
 }
 
 public class ParsedUser

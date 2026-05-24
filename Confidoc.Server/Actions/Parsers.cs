@@ -1,13 +1,44 @@
-using System.Text;
 using Confidoc.Server.Models;
+using ConfidocLib;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
+using System.Text;
 
 namespace Confidoc.Server;
 
 public partial class Actions
 {
-    
+
+
+    /// <summary>
+    /// Converts the normal markdown document into a PDF
+    /// form.
+    /// </summary>
+    /// <param name="document"></param>
+    /// <returns></returns>
+    public ParsedDocument ToPdfDocument(ParsedDocument document, string user, bool download=true)
+    {
+        var pdfDoc = new ParsedDocument()
+        {
+            Id = document.Id,
+            Name = document.Name,
+            Level = document.Level,
+            Grants = document.Grants.Where(g => g.Receiver == user),
+            Changes = [],
+            Data = download ? Convert.ToBase64String(Pdf.PdfToImagePdf(Pdf.MdToPdf(document.Data ?? ""))) : "",
+            Created = document.Created,
+            LastModified = document.LastModified,
+            Owner = document.Owner,
+            Encrypted = document.Encrypted,
+            ReadAccessGroups = [],
+            WriteAccessGroups = [],
+            ReadAccessUsers = [user],
+            WriteAccessUsers = [],
+        };
+        return pdfDoc;
+    }
+
     /// <summary>
     /// Converts the original collection of documents into an
     /// easily ingestable form that doesn't leak needless
@@ -25,14 +56,15 @@ public partial class Actions
             LastModified = (document.LastModified ?? DateTime.MinValue).Ticks,
             Owner = document.Owner!.UserName,
             Encrypted = document.Encrypted,
+            Grants = ParseGrants(_context.Grants.Include(g => g.Grantee).Where(g => g.ResourceId == document.Id)),
             ReadAccessUsers = (document.ReadAccessUsers ?? []).Select(user => user.UserName!),
             WriteAccessUsers = (document.WriteAccessUsers ?? []).Select(user => user.UserName!),
             ReadAccessGroups = (document.ReadAccessGroups ?? []).Select(group => group.Name!),
             WriteAccessGroups = (document.WriteAccessGroups ?? []).Select(group => group.Name!),
-            Changes = ReconstructDocument(document.Id??"", password).Changes!.Select(
+            Changes = ReconstructDocument(document.Id ?? "", password).Changes!.Select(
                 change => ToParsedChange(change)
             ),
-            Data = Encoding.Latin1.GetString(Convert.FromBase64String(ReconstructDocument(document.Id??"", password).Data!))
+            Data = Encoding.Latin1.GetString(Convert.FromBase64String(ReconstructDocument(document.Id ?? "", password).Data!))
         }).ToList();
     }
 

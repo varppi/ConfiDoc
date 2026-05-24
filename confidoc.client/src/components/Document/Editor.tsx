@@ -87,7 +87,7 @@ function Editor() {
                 <>
                     <section className="flex justify-center mx-2 max-xl:flex-col gap-4">
                         <div className="p-4 rounded-xl flex flex-col max-w-[1500px] w-full gap-2 bg-[var(--same)]/10 backdrop-blur-[5px]
-                                    border-1 border-[var(--cont)]/15 prose prose-slate trasition-[0] justify-between">
+                                    border-1 border-[var(--cont)]/5 prose prose-slate trasition-[0] justify-between">
                             <MDXEditor ref={editorRef} spellCheck={false} className="editor" markdown={data} plugins={[
                                 headingsPlugin(),
                                 listsPlugin(),

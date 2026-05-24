@@ -11,6 +11,8 @@ using Confidoc.Server.Helpers;
 using System.Net;
 using ConfidocLib;
 using System.Security.Cryptography;
+using System.Text;
+using System.Buffers.Text;
 
 namespace Confidoc.Server.Controllers
 {
@@ -35,6 +37,7 @@ namespace Confidoc.Server.Controllers
 
         public class GetDocumentRequest
         {
+            public string? Token { get; set; }
             public string? Password { get; set; }
         }
 
@@ -106,7 +109,7 @@ namespace Confidoc.Server.Controllers
             ParsedDocument? doc;
             try
             {
-                doc = _actions.GetDocument(id, User, req.Password);
+                doc = _actions.GetDocument(id, User, req.Password, download: false);
             }
             catch (CryptographicException)
             {
@@ -116,6 +119,34 @@ namespace Confidoc.Server.Controllers
                 return HttpStatus.NotFoundAllowed;
 
             return new JsonResult(doc);
+        }
+
+        [Route("{id}/pdf")]
+        [HttpPost]
+        public async Task<IActionResult> GetPdfVersion(string id, [FromForm] GetDocumentRequest req)
+        {
+            ConfidocUser? user = null;
+            if (User.Identity is null || User.Identity.Name is null)
+            {
+                var jwtName = Jwt.GetUsernameFromToken(req.Token ?? "");
+                if (jwtName is not null) user = _actions.GetUser(jwtName);
+            }
+            else user = _actions.GetUser(User);
+
+            if (user is null) return HttpStatus.NotFoundAllowed;
+            ParsedDocument? doc;
+            try
+            {
+                doc = _actions.GetDocument(id, user, req.Password, downLevel: 1, download: true);
+            }
+            catch (CryptographicException)
+            {
+                return HttpStatus.Forbidden;
+            }
+            if (doc is null)
+                return HttpStatus.NotFoundAllowed;
+
+            return File(Convert.FromBase64String(doc.Data ?? ""), "application/pdf", $"{doc.Name}.pdf");
         }
 
         [Route("{id}/modify")]

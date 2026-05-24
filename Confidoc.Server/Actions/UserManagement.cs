@@ -189,6 +189,7 @@ public partial class Actions
 
         if (document.Owner == user || roles.Contains("admin"))
             access = 3;
+
         return access;
     }
 
@@ -268,7 +269,7 @@ public partial class Actions
     {
         var user = GetUser(claim);
         if (user is null) throw Exceptions.Null;
-        var role = await _roleManager.FindByIdAsync(group);
+        var role = await _roleManager.FindByNameAsync(group);
         if (role is null) throw Exceptions.Null;
         var parsedGroup = await ToParsedGroup(role);
         if (GroupAccessLevel(user, group) < 1)

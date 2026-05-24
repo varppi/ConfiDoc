@@ -1,6 +1,7 @@
 ﻿using Confidoc.Server.Models;
 using Microsoft.AspNetCore.Identity;
 using Confidoc.Server.Database;
+using Serilog.Core;
 
 namespace Confidoc.Server;
 
@@ -9,7 +10,6 @@ public partial class Actions
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ConfidocUser> _userManager;
     private readonly RoleManager<ConfidocRole> _roleManager;
-
     public async void Initialize()
     {
         try

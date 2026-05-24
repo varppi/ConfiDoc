@@ -8,6 +8,7 @@ using System.Text;
 
 namespace Confidoc.Server;
 
+
 public partial class Actions
 {
     /// <summary>
@@ -22,6 +23,7 @@ public partial class Actions
         return ToParsedDocuments(documents);
     }
 
+
     /// <summary>
     /// Gets a document by ID and verifies that the 
     /// user has access to it.
@@ -29,15 +31,23 @@ public partial class Actions
     /// <param name="id"></param>
     /// <param name="claim"></param>
     /// <returns></returns>
-    public ParsedDocument? GetDocument(string id, ClaimsPrincipal claim, string? password=null)
+    public ParsedDocument? GetDocument(
+        string id, 
+        ConfidocUser? user, 
+        string? password = null, 
+        int? downLevel = null,
+        bool download = true)
     {
+        if (user is null) return null;
         var document = GetDocumentByID(id);
         if (document is null) return null;
-        if (DocumentAccessLevel(claim, document) < 1) return null;
+        var accessLevel = DocumentAccessLevel(user, document);
+        if (downLevel is not null) accessLevel = accessLevel < downLevel ? accessLevel : downLevel ?? 0;
+        if (accessLevel < 1) return null;
         if (document.Encrypted is not null)
             try
             {
-                Security.Decrypt(document.Encrypted, password??"");
+                Security.Decrypt(document.Encrypted, password ?? "");
             }
             catch
             {
@@ -45,9 +55,25 @@ public partial class Actions
             }
 
         var parsedDocument = ToParsedDocuments([document], password)[0];
-
+        parsedDocument.Level = accessLevel;
+        if (accessLevel == 1) return ToPdfDocument(parsedDocument, user.UserName??"", download);
+        
         return parsedDocument;
     }
+
+    /// <summary>
+    /// Gets a document by ID and verifies that the 
+    /// user has access to it.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="claim"></param>
+    /// <returns></returns>
+    public ParsedDocument? GetDocument(string id, 
+        ClaimsPrincipal claim, 
+        string? password=null, 
+        int? downLevel=null,
+        bool download=true)
+        => GetDocument(id, GetUser(claim), password, downLevel, download);
 
     /// <summary>
     /// Creates a new document 

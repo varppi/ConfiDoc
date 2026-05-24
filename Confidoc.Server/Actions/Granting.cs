@@ -8,20 +8,6 @@ using System.Security.Claims;
 
 namespace Confidoc.Server
 {
-    public class ParsedGrant
-    {
-        public string? Id { get; set; }
-        public bool Expired { get; set; }
-        public DateTime? Ends { get; set; }
-        public DateTime? Starts { get; set; }
-        public string? Grantee { get; set; }
-        public string? Receiver { get; set; }
-        public int? Level { get; set; }
-        public string? ReceiverType { get; set; }
-        public string? ResourceType { get; set; }
-        public string? ResourceId { get; set; }
-    }
-
     public partial class Actions
     {
         /// <summary>
@@ -103,6 +89,8 @@ namespace Confidoc.Server
             string document,
             double duration)
         {
+            _context.Grants.Where(g => g.Receiver == receiver && g.ResourceId == document)
+                .ExecuteDelete();
             var grant = new Grant
             {
                 Id = Guid.NewGuid().ToString(),
@@ -168,9 +156,10 @@ namespace Confidoc.Server
                      Receiver = grant.Receiver,
                      ReceiverType = grant.ReceiverType,
                      Level = grant.Level,
-                     Starts = grant.Starts,
-                     Ends = grant.Ends,
+                     Starts = (grant.Starts??DateTime.MinValue).Ticks,
+                     Ends = (grant.Ends??DateTime.MinValue).Ticks,
                      Expired = DateTime.Now > grant.Ends,
+                     MinutesLeft = (grant.Ends ?? DateTime.MinValue).Subtract(DateTime.Now).Minutes,
                      ResourceId = grant.ResourceId,
                      ResourceType = grant.ResourceType,
                  });

@@ -8,6 +8,25 @@ namespace Confidoc.Server.Helpers
 {
     public static class Jwt
     {
+        public static string? GetUsernameFromToken(string token)
+        {
+            var secretKey = GetSecretKey();
+            var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+            var validationParameters = new TokenValidationParameters()
+            {
+                ValidateLifetime = false, 
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidIssuer = Configuration.GetEnvVariable("CONFIDOC_JWT_ISSUER"),
+                ValidAudience = Configuration.GetEnvVariable("CONFIDOC_JWT_AUDIENCE"),
+                IssuerSigningKey = secretKey
+            };
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+            handler.ValidateToken(token, validationParameters, out var validToken);
+            return jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        }
+
         public static string GenerateToken(ConfidocUser user)
         {
             if (user is null || user.UserName is null)

@@ -2,6 +2,7 @@ using Confidoc.Server;
 using Confidoc.Server.Database;
 using Confidoc.Server.Helpers;
 using Confidoc.Server.Models;
+using ConfidocLib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -102,6 +103,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddConfidocActions();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+Pdf.Initialize();
 
 // Observability
 builder.Services.AddHealthChecks();

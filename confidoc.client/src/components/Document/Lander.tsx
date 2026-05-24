@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, type JSX } from "react";
 import axios from "axios";
-import { getConfig, getPassword, convertTicksToJs, type DocumentEntry, setPassword, type GroupEntry } from "../../globals";
+import { getConfig, getPassword, convertTicksToJs, type DocumentEntry, setPassword, type GroupEntry, getToken } from "../../globals";
 import Message from "../../components/Message";
 import NotFound from "../../NotFound";
 
@@ -239,7 +239,7 @@ function Lander() {
                 document && 
                 <section className="flex justify-center mx-2">
                     <div className="p-4 rounded-xl flex flex-col max-w-[800px] w-full gap-2 bg-[var(--same)]/5 backdrop-blur-[5px]
-                                    border-1 border-[var(--cont)]/15 mt-[calc(50px+5vh)]">
+                                    border-1 border-[var(--cont)]/15 mt-[1vh]">
                         <h1 className="text-4xl uppercase font-semibold border-l-4 
                                         border-[var(--primary)] ps-2 ms-2 mb-4"
                         >{document.name}</h1>
@@ -276,6 +276,9 @@ function Lander() {
                                                         flex items-center gap-2 pe-3">
                                             <span>{user}</span>
                                             <span className="text-[10px]">(READ & WRITE)</span>
+                                            <span className="text-[10px]">
+                                                {Math.floor((document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                            </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
                                                             uppercase bg-[var(--danger)] w-fit rounded-3xl text-white
@@ -293,6 +296,9 @@ function Lander() {
                                                         flex items-center gap-2 pe-3">
                                             <span>{user}</span>
                                             <span className="text-[10px]">(READ)</span>
+                                            <span className="text-[10px]">
+                                                {Math.floor((document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                            </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
                                                             uppercase bg-[var(--danger)] w-fit rounded-3xl text-white
@@ -303,7 +309,7 @@ function Lander() {
                                     )
                                 }
                             </div>
-                            <form className="flex gap-2 rounded2xl"
+                            <form className="flex max-md:flex-col gap-2 rounded-2xl"
                                 action={AddUserAccess}>
                                 <input 
                                     placeholder="username" 
@@ -313,14 +319,14 @@ function Lander() {
                                             rounded-xl w-full"/>
                                 <select className="border-1 border-[var(--primary)] outline-none 
                                             focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
-                                            rounded-xl w-fit font-semibold"
+                                            rounded-xl min-md:w-fit font-semibold"
                                         name="level">
                                         <option value={"read"}>READ</option>
                                         <option value={"write"}>READ & WRITE</option>
                                 </select>
                                 <select className="border-1 border-[var(--primary)] outline-none
                                         focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
-                                        rounded-xl w-fit font-semibold"
+                                        rounded-xl min-md:w-fit font-semibold"
                                     name="duration">
                                         <option value={"1"}>1h</option>
                                         <option value={"8"}>8h</option>
@@ -345,6 +351,9 @@ function Lander() {
                                                         flex items-center gap-2 pe-3">
                                             <span>{groups&&groups.find(g => g.id == group)?.displayName}</span>
                                             <span className="text-[10px]">(READ & WRITE)</span>
+                                            <span className="text-[10px]">
+                                                {Math.floor((document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                            </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
                                                             uppercase bg-[var(--danger)] w-fit rounded-3xl text-white
@@ -362,6 +371,9 @@ function Lander() {
                                                         flex items-center gap-2 pe-3">
                                             <span>{groups&&groups.find(g => g.id == group)?.displayName}</span>
                                             <span className="text-[10px]">(READ)</span>
+                                            <span className="text-[10px]">
+                                                {Math.floor((document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                            </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
                                                             uppercase bg-[var(--danger)] w-fit rounded-3xl text-white
@@ -372,7 +384,7 @@ function Lander() {
                                     )
                                 }
                             </div>
-                            <form className="flex gap-2 rounded-2xl"
+                            <form className="flex max-md:flex-col gap-2 rounded-2xl"
                                 action={AddGroupAccess}>
                                 <select className="border-1 border-[var(--primary)] outline-none 
                                             focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-2 
@@ -385,14 +397,14 @@ function Lander() {
                                 </select>
                                 <select className="border-1 border-[var(--primary)] outline-none 
                                             focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
-                                            rounded-xl w-fit font-semibold"
+                                            rounded-xl min-md:w-fit font-semibold"
                                         name="level">
                                         <option value={"read"}>READ</option>
                                         <option value={"write"}>READ & WRITE</option>
                                 </select>
                                 <select className="border-1 border-[var(--primary)] outline-none
                                     focus:shadow-[0_0_5px_var(--primary)] bg-[var(--same)]/55 text-xl p-1
-                                    rounded-xl w-fit font-semibold"
+                                    rounded-xl min-md:w-fit font-semibold"
                                     name="duration">
                                     <option value={"1"}>1h</option>
                                     <option value={"8"}>8h</option>
@@ -421,10 +433,22 @@ function Lander() {
                                 >Delete{verify > 0 ? ` (wait ${verify}s)` : ""}</button>
 
                             }
-                            <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--primary)]
-                                                uppercase bg-[var(--primary)] w-full rounded-xl"
-                                    onClick={() => openDoc()}
-                            >Open/Modify</button>
+                            {
+                                    document.level == 1 ?
+                                        <form className="w-full" method="POST" action={`/api/document/${document.id}/pdf`}>
+                                            <input hidden name="token" value={getToken()??""}></input>
+                                            <input hidden name="password" value=""></input>
+                                            <button className="text-center p-2 cursor-pointer hover:shadow-[0_0_5px_var(--primary)]
+                                                        uppercase bg-[var(--primary)] w-full rounded-xl"
+                                                    type="submit"
+                                            >Download</button>
+                                        </form>
+                                : 
+                                <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--primary)]
+                                                    uppercase bg-[var(--primary)] w-full rounded-xl"
+                                        onClick={() => openDoc()}
+                                >Open/Modify</button>
+                            }
                         </div>
                         {message}
                     </div>

@@ -17,7 +17,7 @@ function Header() {
                 className="
                 w-[calc(100%_-_5vw)] mt-3 bg-[var(--same)]/10 backdrop-blur-[4px] max-w-[100vw]
                 border-2 border-[var(--primary)] rounded-full fixed gap-1 px-2
-                flex z-1"
+                flex z-1 font-bold"
             >
                 {
                     isLoggedIn()

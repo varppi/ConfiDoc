@@ -99,10 +99,14 @@ html,body,div {
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     color: rgb(255,255,255);
     --basePageBg: rgb(255, 186, 26);
-    border-radius: 10px;
-    box-shadow: 0 0 3px var(--contTransp);
     max-height: calc(50px + 60vh);
     height:100% !important;
+    background-color: var(--same);
+    margin-bottom: 10px;
+}
+
+.editor * {
+    border-radius: 0 !important;
 }
 
 [role="textbox"] {

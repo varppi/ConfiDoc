@@ -112,9 +112,20 @@ export interface GroupEntry {
     members: string[]
 }
 
+export interface Grant {
+    grantee: string,
+    receiver: string,
+    minutesLeft: number,
+    level: number,
+    starts: number,
+    ends: number
+}
+
 export interface DocumentEntry {
     id: string,
+    level: number,
     name: string,
+    grants: Grant[],
     created: number,
     lastModified: number,
     size: number,
