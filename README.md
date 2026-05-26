@@ -1,4 +1,4 @@
-<img width="1920" height="340"  src="https://github.com/user-attachments/assets/36f26726-64f5-41c9-8136-e9261dbb6ac3" />
+<img width="1920" height="340" alt="Comp 1_00000" src="https://github.com/user-attachments/assets/f553bb89-5e84-489d-b895-450864c98d8c" />
 <p align="center">
 <img src="https://img.shields.io/badge/.NET-5C2D91?style=for-the-badge&logo=.net&logoColor=white">
 <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white">
@@ -8,11 +8,11 @@
 <img src="https://img.shields.io/badge/OpenTelemetry-F5B727?&style=for-the-badge&logo=opentelemetry&logoColor=black">
 </p>
 
-### <b>A document management service designed to aid secure document handling, to streamline access control and make it easier to discover sources of data leaks.</b>
+### <b>A document management service designed to enable strict access control, auditing and rapid identification of data breach sources.</b>
 <br>
 
 > [!CAUTION]
-> <b>This project is VERY work in progress. Not all the features advertised on the front page are implemented yet and the project has yet to undergo rigorous security testing.</b>
+> <b>This project is a work in progress and is yet to undergo rigorous security and general testing.</b>
 
 ## Roadmap
 - [X] Base features like account, document and group creation.
@@ -31,7 +31,7 @@
 <br>
 
 ## Brief technical details
-- All changes are signed with the private key of the user who made them using ECDSA. In the future, this private key will be encrypted such that it is only decryptable with the user's password, which the server does not know.
+- All changes are signed with the private key of the user who made them using ECDSA. In the future, this private key will be encrypted such that it is only decryptable with the user's password, which the server does not know directly.
 - If you enable document encryption, it means all the document's data is encrypted using AES-256 during rest and only briefly decrypted server side using the user's provided key, when a user modifies or tries to read the contents of the document.
 
 ## Installation (requires .NET 10 or Docker)
@@ -64,7 +64,16 @@ LOG_LEVEL=debug
 ```
 
 ## Screenshot gallery
-<img width="1200" src="https://github.com/user-attachments/assets/382d339b-81f6-4a70-b11e-4739e2ad235d" />
-<img width="1200" src="https://github.com/user-attachments/assets/6a4786ed-bae5-4fab-891e-6e8805c4409d" />
-<img width="1200" src="https://github.com/user-attachments/assets/dbf085c2-6a79-4530-8379-6b01ea2d16fb" />
+### Front page
+<img width="1917" height="906" alt="image" src="https://github.com/user-attachments/assets/c542b294-c27c-4b20-92cd-4bdd86da8124" />
+
+### Event logs show 50 of the latest document related events (admin sees every document, normally you see only documents you own). Different actions have different colored text to make it easier to spot unusual activity.
+<img width="1919" height="943" alt="image" src="https://github.com/user-attachments/assets/35439e45-4edf-4f13-9830-07d689afecd7" />
+
+
+### Markdown editor
+<img width="1920" height="944" alt="image" src="https://github.com/user-attachments/assets/2d216428-7015-4945-bc4d-1fb44c479826" />
+
+### Downloaded PDF version of the document. The vertical gray lines contain the download event ID in binary format, which can be used to query who downloaded the PDF file.
+<img width="1915" height="941" alt="image" src="https://github.com/user-attachments/assets/14ce78b7-93be-4a26-8e69-a16ea8c43d26" />
 
