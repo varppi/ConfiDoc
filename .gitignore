@@ -1,6 +1,6 @@
 obj
 log.txt
-confidoc.db
+confidoc.db*
 
 
 ## Ignore Visual Studio temporary files, build results, and

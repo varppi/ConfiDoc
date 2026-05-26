@@ -23,7 +23,8 @@
 - [x] Admin accounts
 - [x] Access periods ("allow access for X days").
 - [x] Read only PDF view.
-- [ ] Tracking information in read only mode, making each download linked to the IP and account of the user.
+- [X] Tracking information in read only mode, making each download linked to the IP and account of the user.
+- [X] Event logs.
 - [ ] Captcha.
 - [ ] Customizable theme and front page.
 

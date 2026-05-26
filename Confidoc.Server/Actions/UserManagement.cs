@@ -68,7 +68,7 @@ public partial class Actions
     /// <param name="grantee"></param>
     /// <param name="user"></param>
     /// <param name="id"></param>
-    public void AddDocumentReadAccess(ClaimsPrincipal grantee, ConfidocUser user, string id, double duration=1)
+    public void AddDocumentReadAccess(ClaimsPrincipal grantee, ConfidocUser user, string id, double duration)
     {
         var document = GetDocumentByID(id);
         if (user is null || user.UserName is null) return;

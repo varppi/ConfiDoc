@@ -1,6 +1,7 @@
 using Confidoc.Server.Models;
 using ConfidocLib;
 using Microsoft.EntityFrameworkCore;
+using PuppeteerSharp;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -25,18 +26,24 @@ public partial class Actions
 
 
     /// <summary>
-    /// Gets a document by ID and verifies that the 
-    /// user has access to it.
+    /// Returns document and makes sure the user has
+    /// permission to view it.
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="claim"></param>
+    /// <param name="user"></param>
+    /// <param name="password"></param>
+    /// <param name="downLevel"></param>
+    /// <param name="download"></param>
+    /// <param name="data"></param>
     /// <returns></returns>
+    /// <exception cref="CryptographicException"></exception>
     public ParsedDocument? GetDocument(
         string id, 
         ConfidocUser? user, 
         string? password = null, 
         int? downLevel = null,
-        bool download = true)
+        bool download = true,
+        string? data = null)
     {
         if (user is null) return null;
         var document = GetDocumentByID(id);
@@ -56,8 +63,7 @@ public partial class Actions
 
         var parsedDocument = ToParsedDocuments([document], password)[0];
         parsedDocument.Level = accessLevel;
-        if (accessLevel == 1) return ToPdfDocument(parsedDocument, user.UserName??"", download);
-        
+        if (accessLevel == 1) return ToPdfDocument(parsedDocument, user.UserName??"", download, data);
         return parsedDocument;
     }
 
@@ -86,8 +92,8 @@ public partial class Actions
         if (document.Owner is null)
             throw new ArgumentNullException("owner must not be null");
         document.Id = Guid.NewGuid().ToString();
-        document.Created = DateTime.Now;
-        document.LastModified = DateTime.Now;
+        document.Created = DateTime.UtcNow;
+        document.LastModified = DateTime.UtcNow;
         document.ReadAccessUsers = [];
         document.WriteAccessUsers = [];
         document.ReadAccessGroups = [];
@@ -125,9 +131,9 @@ public partial class Actions
             Patch     = patch,
             Signature = SignData(patch??"", user),
             Owner     = user,
-            Timestamp = DateTime.Now,
+            Timestamp = DateTime.UtcNow,
         };
-        document.LastModified = DateTime.Now;
+        document.LastModified = DateTime.UtcNow;
         document.Changes!.Add(change);
         _context.SaveChanges();
         return true;

@@ -1,4 +1,5 @@
 ﻿using Markdig;
+using Markdig.Helpers;
 using Microsoft.VisualBasic;
 using PdfiumViewer;
 using PdfSharp.Drawing;
@@ -12,6 +13,7 @@ using System.Drawing.Imaging;
 using System.Runtime.Intrinsics.Arm;
 using System.Text;
 using System.Text.Encodings.Web;
+using static System.Collections.Specialized.BitVector32;
 
 namespace ConfidocLib
 {
@@ -23,11 +25,68 @@ namespace ConfidocLib
             await browserFetcher.DownloadAsync();
         }
 
-        public static Image Datamark(Image inputImage)
+        /// <summary>
+        /// Extracts data embedded in datamarked PDF images.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> ExtractDatamark(Image input)
         {
+            List<string> outputs = new();
+            for (int imageShift = 0; imageShift < 2; imageShift++)
+            {
+                Bitmap bmp = new(input);
+                List<int> binaryValues = new();
+                for (int x = imageShift; x < bmp.Width-imageShift; x++)
+                {
+                    var pixel = bmp.GetPixel(x, 5);
+                    int r = pixel.R;
+                    int g = pixel.G;
+                    int b = pixel.B;
+                    double brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+                    binaryValues.Add(brightness > 248 ? 0 : 1);
+                }
+                for (int shift = 0; shift < 17; shift++) {
+                    for (int spacing = 1; spacing < 101; spacing++) {
+                        var construct = "";
+                        for (int i = 0; i < Math.Round((double)binaryValues.Count/spacing); i++)
+                        {
+                            int value = binaryValues[i*spacing];
+                            construct += value;
+                        }
+                        construct =  new string('0', shift) + construct;
+                        List<char> chars = new List<char>();
+                        for (int i = 0; i < construct.Length; i += 8)
+                        {
+                            string byteString;
+                            if (i + 8 > construct.Length)
+                                continue;
+                            byteString = construct.Substring(i, 8);
+                            chars.Add((char)Convert.ToInt32(byteString, 2));
+                        }
+                        string decodedText = new string(chars.ToArray());
+                        if (decodedText.Contains("000"))
+                            outputs.Add(new string(decodedText.Where(c => !c.IsControl()).ToArray()));
+                    }
+                }
+            }
+            return outputs;
+        }
+
+
+        /// <summary>
+        /// Tags the input image with whatever piece of text inputted.
+        /// This will be used to tag every page of the PDF with the
+        /// event ID of the download.
+        /// </summary>
+        /// <param name="inputImage"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static Image Datamark(Image inputImage, string data)
+        {
+            data = $"000{data}000";
             Bitmap input = new Bitmap(inputImage);
 
-            string data = "testing data";
             List<int> bits = data
                 .SelectMany(c =>
                     Convert.ToString(c, 2)
@@ -43,18 +102,17 @@ namespace ConfidocLib
                 {
                     Color original = input.GetPixel(x, y);
 
-                    int bit = bits[(int)Math.Round((decimal)x/2) % bitCount];
+                    int bit = bits[(int)Math.Round((decimal)x/4) % bitCount];
 
                     int r = original.R;
                     int g = original.G;
                     int b = original.B;
 
-                    // If bit is 1, darken slightly
                     if (bit == 1)
                     {
-                        r = Math.Max(r-1, 0);
-                        g = Math.Max(g-1, 0);
-                        b = Math.Max(b-1, 0);
+                        r = Math.Max(r-25, 0);
+                        g = Math.Max(g-25, 0);
+                        b = Math.Max(b-25, 0);
                     }
 
                     input.SetPixel(
@@ -72,8 +130,9 @@ namespace ConfidocLib
         /// Converts PDF into a series of images in a PDF form.
         /// </summary>
         /// <param name="pdfData"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public static byte[] PdfToImagePdf(byte[] pdfData)
+        public static byte[] PdfToImagePdf(byte[] pdfData, string data="a")
         {
             var pageImages = new List<byte[]>();
 
@@ -86,7 +145,7 @@ namespace ConfidocLib
                 var encoderParams = new EncoderParameters(1);
                 encoderParams.Param[0] =
                     new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 100L);
-                var markedImage = Datamark(image);
+                var markedImage = Datamark(image, data);
                 using (var imageStream = new MemoryStream())
                 {
                     markedImage.Save(imageStream, ImageFormat.Png);

@@ -94,8 +94,8 @@ namespace Confidoc.Server
             var grant = new Grant
             {
                 Id = Guid.NewGuid().ToString(),
-                Starts = DateTime.Now,
-                Ends = DateTime.Now.AddHours(duration),
+                Starts = DateTime.UtcNow,
+                Ends = DateTime.UtcNow.AddHours(duration),
                 Grantee = grantee,
                 Level = level,
                 Receiver = receiver,
@@ -113,7 +113,7 @@ namespace Confidoc.Server
             string receiver,
             string document,
             int level,
-            double duration = .5)
+            double duration)
         {
             var user = GetUser(claim);
             if (user is null) return null;
@@ -125,7 +125,7 @@ namespace Confidoc.Server
             string receiver,
             string document, 
             int level,
-            double duration=.5)
+            double duration)
         {
             if (user is null) return null;
             var receiverUser = GetUser(receiver);
@@ -138,7 +138,7 @@ namespace Confidoc.Server
             string receiver,
             string document,
             int level,
-            double duration = .5)
+            double duration)
             => CreateUserDocumentGrant(GetUser(claim), receiver, document, level, duration);
 
         /// <summary>
@@ -158,8 +158,8 @@ namespace Confidoc.Server
                      Level = grant.Level,
                      Starts = (grant.Starts??DateTime.MinValue).Ticks,
                      Ends = (grant.Ends??DateTime.MinValue).Ticks,
-                     Expired = DateTime.Now > grant.Ends,
-                     MinutesLeft = (grant.Ends ?? DateTime.MinValue).Subtract(DateTime.Now).Minutes,
+                     Expired = DateTime.UtcNow > grant.Ends,
+                     MinutesLeft = (int)(grant.Ends ?? DateTime.MinValue).Subtract(DateTime.UtcNow).TotalMinutes,
                      ResourceId = grant.ResourceId,
                      ResourceType = grant.ResourceType,
                  });

@@ -121,10 +121,20 @@ export interface Grant {
     ends: number
 }
 
+export interface Event {
+    id: string,
+    user: string,
+    userAgent: string,
+    ip: string,
+    timestamp: number,
+    action: string
+}
+
 export interface DocumentEntry {
     id: string,
     level: number,
     name: string,
+    events: Event[],
     grants: Grant[],
     created: number,
     lastModified: number,

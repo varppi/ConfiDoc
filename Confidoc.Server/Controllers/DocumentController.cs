@@ -87,6 +87,13 @@ namespace Confidoc.Server.Controllers
                 ? null
                 : Security.Encrypt("confidoc", Security.HashString(req.Password))
             });
+            _actions.AddEvent(_actions.TemplateEvent(
+                Request,
+                HttpContext,
+                User,
+                $"create:{id}"
+                )
+            );
             return new JsonResult(new
             {
                 Id = id,
@@ -118,6 +125,14 @@ namespace Confidoc.Server.Controllers
             if (doc is null)
                 return HttpStatus.NotFoundAllowed;
 
+            _actions.AddEvent(_actions.TemplateEvent(
+                Request,
+                HttpContext,
+                User,
+                $"view:{id}"
+                )
+            );
+
             return new JsonResult(doc);
         }
 
@@ -138,6 +153,22 @@ namespace Confidoc.Server.Controllers
             try
             {
                 doc = _actions.GetDocument(id, user, req.Password, downLevel: 1, download: true);
+                var eventId = _actions.AddEvent(_actions.TemplateEvent(
+                    Request,
+                    HttpContext,
+                    user,
+                    $"download:{id}"
+                    )
+                );
+                doc = _actions.GetDocument(
+                    id, 
+                    user, 
+                    req.Password, 
+                    downLevel: 1, 
+                    download: true, 
+                    data: 
+                    eventId
+                );
             }
             catch (CryptographicException)
             {
@@ -159,6 +190,14 @@ namespace Confidoc.Server.Controllers
             var success = _actions.SaveDocument(id, req.Data, User, req.Password);
             if (!success) return HttpStatus.NotFoundAllowed;
 
+            _actions.AddEvent(_actions.TemplateEvent(
+                Request,
+                HttpContext,
+                User,
+                $"update:{id}"
+                )
+            );
+
             return HttpStatus.Ok;
         }
 
@@ -169,7 +208,13 @@ namespace Confidoc.Server.Controllers
         {
             var success = _actions.DeleteDocument(id, User);
             if (!success) return HttpStatus.NotFoundAllowed;
-
+            _actions.AddEvent(_actions.TemplateEvent(
+                Request,
+                HttpContext,
+                User,
+                $"delete:{id}"
+                )
+            );
             return HttpStatus.Ok;
         }
 
@@ -178,10 +223,18 @@ namespace Confidoc.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveUserDocAccess(string id, [FromBody] RemoveAccessRequest req)
         {
-            if (_actions.DocumentAccessLevel(User, id) < 3) return HttpStatus.NotFoundAllowed;
             var user = _actions.GetUser(req.Name!);
+            if (_actions.DocumentAccessLevel(User, id) < 3 && req.Name != user?.UserName) return HttpStatus.NotFoundAllowed;
             if (user is null) return HttpStatus.NotFoundAllowed;
             _actions.RemoveDocumentAccess(user, id);
+
+            _actions.AddEvent(_actions.TemplateEvent(
+                Request,
+                HttpContext,
+                User,
+                $"remove access from user '{user.UserName?.Replace(":", "")}':{id}"
+                )
+            );
             return HttpStatus.Ok;
         }
 
@@ -192,6 +245,14 @@ namespace Confidoc.Server.Controllers
         {
             if (_actions.DocumentAccessLevel(User, id) < 3) return HttpStatus.NotFoundAllowed;
             _actions.RemoveDocumentAccess(_actions.GetGroupUnsafe(req.Name!), id);
+
+            _actions.AddEvent(_actions.TemplateEvent(
+                Request,
+                HttpContext,
+                User,
+                $"remove access from group '{req.Name?.Replace(":", "")}':{id}"
+                )
+            );
             return HttpStatus.Ok;
         }
 
@@ -208,9 +269,23 @@ namespace Confidoc.Server.Controllers
             {
                 case "read":
                     _actions.AddDocumentReadAccess(User, user, id, (double)(req.Duration ?? 0));
+                    _actions.AddEvent(_actions.TemplateEvent(
+                        Request,
+                        HttpContext,
+                        User,
+                        $"add read access to user '{user.UserName?.Replace(":", "")}' for {req.Duration}h:{id}"
+                        )
+                    );
                     break;
                 case "write":
                     _actions.AddDocumentWriteAccess(User, user, id, (double)(req.Duration ?? 0));
+                    _actions.AddEvent(_actions.TemplateEvent(
+                        Request,
+                        HttpContext,
+                        User,
+                        $"add read & write access to user '{user.UserName?.Replace(":", "")}' for {req.Duration}h:{id}"
+                        )
+                    );
                     break;
             }
             return HttpStatus.Ok;
@@ -228,9 +303,23 @@ namespace Confidoc.Server.Controllers
             {
                 case "read":
                     _actions.AddDocumentReadAccess(User, group, id, (double)(req.Duration??0));
+                    _actions.AddEvent(_actions.TemplateEvent(
+                        Request,
+                        HttpContext,
+                        User,
+                        $"add read access to group '{req.Name?.Replace(":", "")}' for {req.Duration}h:{id}"
+                        )
+                    );
                     break;
                 case "write":
                     _actions.AddDocumentWriteAccess(User, group, id, (double)(req.Duration??0));
+                    _actions.AddEvent(_actions.TemplateEvent(
+                        Request,
+                        HttpContext,
+                        User,
+                        $"add read & write access to group '{req.Name?.Replace(":", "")}' for {req.Duration}h:{id}"
+                        )
+                    );
                     break;
             }
             return HttpStatus.Ok;

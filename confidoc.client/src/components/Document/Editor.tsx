@@ -72,7 +72,7 @@ function Editor() {
     }, [updateDoc])
  
     return (
-        <main className="mt-5">
+        <main className="mt-5 mb-[-37vh]">
             {
                 (message && document == null) &&
                 <div className="flex justify-center items-center h-[calc(20vh+100px)]">
@@ -120,14 +120,14 @@ function Editor() {
                             {message }
                         </div>
                         <section className="w-full min-xl:max-w-[450px] w-full bg-[var(--same)]/10 rounded-2xl border-1 
-                                            border-[var(--cont)]/15 backdrop-blur-[5px]">
+                                            border-[var(--cont)]/15 backdrop-blur-[5px] max-h-[60vh]">
 
                             <h1 className="text-[var(--cont)] text-4xl flex items-center gap-2
                                         uppercase w-min m-2"
                             ><span className="text-[var(--primary)]"><CheckCircleBroken size="30px"/></span> Changes</h1>
 
                             <div className="ps-5 pt-3 border-[var(--cont)]/5 flex flex-col border-t-2
-                                            gap-5 min-h-[200px] overflow-y-scroll mt-2 ">
+                                            gap-5 min-h-[200px] overflow-y-scroll mt-2 max-h-[calc(60vh_-_75px)] ">
                                 {
                                     document.changes
                                     .sort((a,b) => b.timestamp - a.timestamp)

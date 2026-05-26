@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Confidoc.Server;
 
@@ -17,16 +18,17 @@ public partial class Actions
     /// </summary>
     /// <param name="document"></param>
     /// <returns></returns>
-    public ParsedDocument ToPdfDocument(ParsedDocument document, string user, bool download=true)
+    public ParsedDocument ToPdfDocument(ParsedDocument document, string user, bool download=true, string? data=null)
     {
         var pdfDoc = new ParsedDocument()
         {
             Id = document.Id,
             Name = document.Name,
             Level = document.Level,
-            Grants = document.Grants.Where(g => g.Receiver == user),
+            Events = [],
+            Grants = (document.Grants ?? []).Where(g => g.Receiver == user),
             Changes = [],
-            Data = download ? Convert.ToBase64String(Pdf.PdfToImagePdf(Pdf.MdToPdf(document.Data ?? ""))) : "",
+            Data = download ? Convert.ToBase64String(Pdf.PdfToImagePdf(Pdf.MdToPdf(document.Data ?? ""), data: data??"a")) : "",
             Created = document.Created,
             LastModified = document.LastModified,
             Owner = document.Owner,
@@ -52,6 +54,17 @@ public partial class Actions
         {
             Id = document.Id,
             Name = document.Name,
+            Events = _context.Events
+                .Where(eve => Regex.IsMatch(eve.Action??"", @$"^.*:{document.Id}$"))
+                .Select(eve => new ParsedEvent
+                {
+                    Id = eve.Id,
+                    Action = eve.Action,
+                    Timestamp = (eve.Timestamp??DateTime.MinValue).Ticks,
+                    Ip = eve.Ip,
+                    User = eve.User,
+                    UserAgent = eve.UserAgent,
+                }).OrderByDescending(eve => eve.Timestamp),
             Created = (document.Created ?? DateTime.MinValue).Ticks,
             LastModified = (document.LastModified ?? DateTime.MinValue).Ticks,
             Owner = document.Owner!.UserName,

@@ -1,13 +1,15 @@
 ﻿using Confidoc.Server.Database;
 using Confidoc.Server.Helpers;
 using Confidoc.Server.Models;
+using ConfidocLib;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ConfidocLib;
 using Newtonsoft.Json;
+using PuppeteerSharp;
 using SQLitePCL;
+using System.Drawing;
 
 namespace Confidoc.Server.Controllers
 {
@@ -28,6 +30,9 @@ namespace Confidoc.Server.Controllers
             _sigInManager = signInManager;
             _actions = actions;
         }
+
+
+
 
         //[HttpGet]
         //[Route("/test")]

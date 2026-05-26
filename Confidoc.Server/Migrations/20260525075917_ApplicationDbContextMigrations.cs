@@ -6,11 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Confidoc.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class ApplicationDbContextMigration : Migration
+    public partial class ApplicationDbContextMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    User = table.Column<string>(type: "TEXT", nullable: true),
+                    UserAgent = table.Column<string>(type: "TEXT", nullable: true),
+                    Ip = table.Column<string>(type: "TEXT", nullable: true),
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Action = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
@@ -385,6 +401,9 @@ namespace Confidoc.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Changes");
+
+            migrationBuilder.DropTable(
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "Grants");

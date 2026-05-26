@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Confidoc.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260523112437_ApplicationDbContextMigration")]
-    partial class ApplicationDbContextMigration
+    [Migration("20260525075917_ApplicationDbContextMigrations")]
+    partial class ApplicationDbContextMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -198,6 +198,31 @@ namespace Confidoc.Server.Migrations
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("Confidoc.Server.Models.Event", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Action")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ip")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("User")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("Confidoc.Server.Models.Grant", b =>

@@ -13,5 +13,6 @@ namespace Confidoc.Server.Database
         public DbSet<Document> Documents { get; set; }
         public DbSet<Change> Changes { get; set; }
         public DbSet<Grant> Grants { get; set; }
+        public DbSet<Event> Events { get; set; }
     }
 }

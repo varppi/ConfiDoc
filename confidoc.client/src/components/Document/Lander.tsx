@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, type JSX } from "react";
 import axios from "axios";
-import { getConfig, getPassword, convertTicksToJs, type DocumentEntry, setPassword, type GroupEntry, getToken } from "../../globals";
+import { getConfig, getPassword, convertTicksToJs, type DocumentEntry, setPassword, type GroupEntry, getToken, getPasswords } from "../../globals";
 import Message from "../../components/Message";
 import NotFound from "../../NotFound";
 
@@ -135,6 +135,9 @@ function Lander() {
             setDocument({
                 id: "<deleted>",
                 name: "<deleted>",
+                events: [],
+                grants: [],
+                level: 0,
                 size: 0,
                 changes: [],
                 created: -5,
@@ -277,7 +280,7 @@ function Lander() {
                                             <span>{user}</span>
                                             <span className="text-[10px]">(READ & WRITE)</span>
                                             <span className="text-[10px]">
-                                                {Math.floor((document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                                {Math.ceil((document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft / 60)}h of access left
                                             </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
@@ -297,7 +300,7 @@ function Lander() {
                                             <span>{user}</span>
                                             <span className="text-[10px]">(READ)</span>
                                             <span className="text-[10px]">
-                                                {Math.floor((document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                                    {Math.ceil((document.grants.find(g => g.receiver == user) ?? { minutesLeft: 0 }).minutesLeft / 60)}h of access left
                                             </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
@@ -352,7 +355,7 @@ function Lander() {
                                             <span>{groups&&groups.find(g => g.id == group)?.displayName}</span>
                                             <span className="text-[10px]">(READ & WRITE)</span>
                                             <span className="text-[10px]">
-                                                {Math.floor((document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                                {Math.ceil((document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft / 60)}h of access left
                                             </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
@@ -372,7 +375,7 @@ function Lander() {
                                             <span>{groups&&groups.find(g => g.id == group)?.displayName}</span>
                                             <span className="text-[10px]">(READ)</span>
                                             <span className="text-[10px]">
-                                                {Math.floor((document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft / 60)}h {(document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft}m left
+                                                    {Math.ceil((document.grants.find(g => g.receiver == group) ?? { minutesLeft: 0 }).minutesLeft / 60)}h of access left
                                             </span>
                                             <div className="flex-grow"/>
                                             <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--danger)] 
@@ -418,7 +421,7 @@ function Lander() {
                                                 font-semibold hover:shadow-[0_0_5px_var(--primary)]">Add</button>
                             </form>
                         </div>
-                        <div className="flex w-full max-w-[400px] gap-2 text-white font-bold mt-5"> 
+                        <div className="flex w-full max-w-[800px] gap-2 text-white font-bold mt-5"> 
                             {
                                 verify == 0
                                 ?
@@ -434,21 +437,22 @@ function Lander() {
 
                             }
                             {
-                                    document.level == 1 ?
-                                        <form className="w-full" method="POST" action={`/api/document/${document.id}/pdf`}>
-                                            <input hidden name="token" value={getToken()??""}></input>
-                                            <input hidden name="password" value=""></input>
-                                            <button className="text-center p-2 cursor-pointer hover:shadow-[0_0_5px_var(--primary)]
-                                                        uppercase bg-[var(--primary)] w-full rounded-xl"
-                                                    type="submit"
-                                            >Download</button>
-                                        </form>
+                                document.level == 1 ?
+                                        <></>
                                 : 
                                 <button className="p-2 cursor-pointer hover:shadow-[0_0_5px_var(--primary)]
                                                     uppercase bg-[var(--primary)] w-full rounded-xl"
                                         onClick={() => openDoc()}
                                 >Open/Modify</button>
                             }
+                            <form className="w-full" method="POST" action={`/api/document/${document.id}/pdf`}>
+                                <input hidden name="token" value={getToken() ?? ""}></input>
+                                <input hidden name="password" value={getPassword(id ?? "") ?? ""}></input>
+                                <button className="text-center p-2 cursor-pointer hover:shadow-[0_0_5px_var(--primary)]
+                                                uppercase bg-[var(--primary)] w-full rounded-xl"
+                                    type="submit"
+                                >Download</button>
+                            </form>
                         </div>
                         {message}
                     </div>

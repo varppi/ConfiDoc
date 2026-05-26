@@ -1,4 +1,5 @@
 using Confidoc.Server.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Confidoc.Server;
 
@@ -25,17 +26,28 @@ public class ParsedDocument
     public string? Id { get; set; }
     public int? Level { get; set; }
     public string? Name { get; set; }
+    public IEnumerable<ParsedEvent>? Events { get; set; }
     public IEnumerable<ParsedChange>? Changes { get; set; }
     public string? Data { get; set; }
     public long? Created { get; set; }
     public long? LastModified { get; set; }
     public string? Owner { get; set; }
     public string? Encrypted { get; set; }
-    public IEnumerable<ParsedGrant> Grants { get; set; }
+    public IEnumerable<ParsedGrant>? Grants { get; set; }
     public IEnumerable<string>? ReadAccessUsers { get; set; }
     public IEnumerable<string>? WriteAccessUsers { get; set; }
     public IEnumerable<string>? ReadAccessGroups { get; set; }
     public IEnumerable<string>? WriteAccessGroups { get; set; }
+}
+
+public class ParsedEvent
+{
+    public string? Id { get; set; }
+    public string? User { get; set; }
+    public string? UserAgent { get; set; }
+    public string? Ip { get; set; }
+    public long? Timestamp { get; set; }
+    public string? Action { get; set; }
 }
 
 public class ParsedGrant

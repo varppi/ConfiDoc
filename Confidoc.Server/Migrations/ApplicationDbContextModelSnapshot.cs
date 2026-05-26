@@ -197,6 +197,31 @@ namespace Confidoc.Server.Migrations
                     b.ToTable("Documents");
                 });
 
+            modelBuilder.Entity("Confidoc.Server.Models.Event", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Action")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ip")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("User")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Events");
+                });
+
             modelBuilder.Entity("Confidoc.Server.Models.Grant", b =>
                 {
                     b.Property<string>("Id")

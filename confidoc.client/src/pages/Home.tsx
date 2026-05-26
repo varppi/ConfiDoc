@@ -33,6 +33,7 @@ function Home() {
                         <button className="bg-[var(--primary)] w-full p-3 text-2xl text-white
                                            uppercase rounded-4xl mt-5 font-semibold
                                            hover:cursor-pointer hover:shadow-[0_0_10px_var(--primary)]"
+                                onClick={()=>navigate("/register")}
                         >Get Started</button>
                     </div>
                 </div>
@@ -42,7 +43,7 @@ function Home() {
                 </div>
             </section>
 
-            <section className="mt-[16vw]">
+            <section className="mt-[15vw]">
                 <div className="flex w-full justify-center">
                     <h1 className="text-4xl text-[var(--cont)] font-bold max-md:text-3xl
                                    uppercase underline decoration-[var(--primary)] decoration-[3px]"
