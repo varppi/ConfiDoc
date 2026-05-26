@@ -57,7 +57,6 @@ html,body,div {
 
 .mdxeditor-root-contenteditable {
     min-height: 60vh;
-    background-color: rgb(128, 128, 128, 0.25) !important;
 }
 
 
@@ -107,7 +106,7 @@ html,body,div {
     max-height: calc(50px + 60vh);
     border-radius: 5px;
     height: 100% !important;
-    background-color: var(--same);
+    background-color: rgb(128, 128, 128, 0.3) !important;
     margin-bottom: 10px;
 }
 
