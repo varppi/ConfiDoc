@@ -161,11 +161,11 @@ function Editor() {
                             </div>
                         </section>
                     </section>
-                    <button className="w-full flex gap-2 rounded-xl bg-[var(--primary)] p-1 m-3
-                            max-w-[140px] uppercase font-semibold
+                    <button className="w-full flex gap-2 rounded-xl bg-[var(--primary)] p-1 m-3 mt-5
+                             max-w-fit p-2 uppercase font-semibold
                             hover:shadow-[0_0_5px_var(--primary)] text-white"
                     onClick={()=>navigate(`/document/${id}`)}
-                    ><ArrowBlockLeft/> document</button>
+                    >back to document</button>
                 </>
             }
         </main>

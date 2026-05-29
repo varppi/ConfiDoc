@@ -42,6 +42,22 @@ public partial class Actions
     }
 
     /// <summary>
+    /// Timestamp converted to ticks for easier parsing.
+    /// </summary>
+    /// <param name="eve"></param>
+    /// <returns></returns>
+    public ParsedEvent ToParsedEvent(Event eve)
+        => new ParsedEvent
+        {
+            Id = eve.Id,
+            Action = eve.Action,
+            Timestamp = (eve.Timestamp ?? DateTime.MinValue).Ticks,
+            Ip = eve.Ip,
+            User = eve.User,
+            UserAgent = eve.UserAgent,
+        };
+
+    /// <summary>
     /// Converts the original collection of documents into an
     /// easily ingestable form that doesn't leak needless
     /// information.
@@ -55,16 +71,10 @@ public partial class Actions
             Id = document.Id,
             Name = document.Name,
             Events = _context.Events
+                .ToList()
                 .Where(eve => Regex.IsMatch(eve.Action??"", @$"^.*:{document.Id}$"))
-                .Select(eve => new ParsedEvent
-                {
-                    Id = eve.Id,
-                    Action = eve.Action,
-                    Timestamp = (eve.Timestamp??DateTime.MinValue).Ticks,
-                    Ip = eve.Ip,
-                    User = eve.User,
-                    UserAgent = eve.UserAgent,
-                }).OrderByDescending(eve => eve.Timestamp),
+                .Select(eve => ToParsedEvent(eve))
+                .OrderByDescending(eve => eve.Timestamp),
             Created = (document.Created ?? DateTime.MinValue).Ticks,
             LastModified = (document.LastModified ?? DateTime.MinValue).Ticks,
             Owner = document.Owner!.UserName,

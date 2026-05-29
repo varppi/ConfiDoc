@@ -1,4 +1,6 @@
 ﻿using Confidoc.Server.Models;
+using ConfidocLib;
+using System.Drawing;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -8,6 +10,22 @@ namespace Confidoc.Server
 {
     public partial class Actions
     {
+        /// <summary>
+        /// Extracts the binary representation of the download
+        /// event ID from a screenshot containing the mark.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="image"></param>
+        /// <returns></returns>
+        public IEnumerable<string>? ExtractDatamarksFromImage(
+            ClaimsPrincipal user, 
+            Image image)
+        {
+            if (user is null) return null;
+            var extracted = Pdf.ExtractDatamark(image);
+            return extracted;
+        }
+
         /// <summary>
         /// Generates 8 long unique ID for an event.
         /// </summary>
@@ -35,11 +53,41 @@ namespace Confidoc.Server
             return eve.Id;
         }
 
+        /// <summary>
+        /// Verifies the user owns the document the event he is trying to view
+        /// is tied to and returns the content of the event if the user does 
+        /// indeed own the document.
+        /// </summary>
+        /// <param name="claim"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ParsedEvent? GetEvent(ClaimsPrincipal claim, string id)
+        {
+            var eve = _context.Events.FirstOrDefault(e => e.Id == id);
+            if (eve is null) return null;
+            var actionsSections = (eve.Action ?? ":").Split(":");
+            if (actionsSections.Length != 2) return null;
+            if (DocumentAccessLevel(claim, actionsSections[1]) < 3) return null;
+            return ToParsedEvent(eve);
+        }
+
+        /// <summary>
+        /// Returns all events 
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Event> GetEvents()
         {
             return _context.Events;
         }
 
+        /// <summary>
+        /// Creates a template encompassing user identifiers.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="user"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public Event TemplateEvent(
             HttpRequest request,
             HttpContext httpContext,
@@ -48,6 +96,14 @@ namespace Confidoc.Server
             => TemplateEvent(request, httpContext, GetUser(user), action);
         
 
+        /// <summary>
+        /// Creates a template encompassing user identifiers.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="user"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public Event TemplateEvent(
             HttpRequest request, 
             HttpContext httpContext, 

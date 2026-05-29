@@ -16,6 +16,7 @@ import Groups from "./components/Dashboard/Groups";
 import NewGroup from "./components/Dashboard/NewGroup";
 import Main from "./components/Dashboard/Main";
 import Setup from "./pages/Setup";
+import Scan from "./components/Dashboard/Scan";
 
 function App() {
 
@@ -52,6 +53,9 @@ function App() {
                 <Route path="groups">
                     <Route index element={<Groups/>}/>
                     <Route path="new" element={<NewGroup/>}/>
+                </Route>
+                <Route path="scan">
+                    <Route index element={<Scan/>}></Route>  
                 </Route>
             </Route>
         </Routes>

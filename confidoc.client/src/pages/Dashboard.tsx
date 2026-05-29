@@ -1,4 +1,4 @@
-import { File02, LogOut01, Menu03, Users01 } from "@untitledui/icons";
+import { File02, LogOut01, Menu03, Scan, Users01 } from "@untitledui/icons";
 import { JSX, useEffect, useState } from "react";
 import DotBackground from "../components/DotBackground";
 import Main from "../components/Dashboard/Main";
@@ -68,6 +68,8 @@ export default function Dashboard() {
                             onClick={() => { changeView("/dashboard/documents") }}><File02 /> Documents</button>
                         <button className="flex-1 w-fit whitespace-nowrap cursor-pointer flex items-center gap-1 uppercase hover:text-[var(--cont)]"
                             onClick={() => { changeView("/dashboard/groups") }}><Users01 /> Groups</button>
+                        <button className="flex-1 w-fit whitespace-nowrap cursor-pointer flex items-center gap-1 uppercase hover:text-[var(--cont)]"
+                            onClick={() => { changeView("/dashboard/scan") }}><Scan /> Scan image</button>
                     </ul>
                     <div className="grow-1"></div>
                     <div className="w-full p-3 flex justify-between gap-5">

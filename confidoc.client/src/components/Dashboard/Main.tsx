@@ -1,7 +1,7 @@
 import {BarChart} from "@mui/x-charts/BarChart";
 import axios from "axios";
 import { useEffect, useMemo, useState, type JSX } from "react";
-import { getConfig, convertTicksToJs, getTheme } from "../../globals";
+import { getConfig, convertTicksToJs, getTheme, generateUniqueColor } from "../../globals";
 import Message from "../Message";
 import { useNavigate } from "react-router-dom";
 import {type DocumentEntry} from "../../globals";
@@ -55,22 +55,7 @@ function Main() {
   //    }
   //  }
     //}
-    function generateUniqueColor(string: string) {
-        let hash = 111111111;
-        let char;
-        if (string.length == 0) return hash;
 
-        for (let i = 0; i < string.length; i++) {
-            char = string.charCodeAt(i);
-            hash ^= Math.abs(char*hash);
-        }
-
-        const hashStr = `${Math.abs(hash)}`;
-        const min = (getTheme() == "light" ? 0   : 50);
-        const max = (getTheme() == "light" ? 175 : 255);
-        const final = `${(min + (parseInt(hashStr.substring(0, 3))) % (max - min))},${(min + (parseInt(hashStr.substring(3, 6))) % (max - min))},${(min + (parseInt(hashStr.substring(6, 9))) % (max - min))}`;
-        return final;
-    }
 
     documents.sort((b,a) => a.lastModified - b.lastModified)
 

@@ -102,7 +102,7 @@ namespace ConfidocLib
                 {
                     Color original = input.GetPixel(x, y);
 
-                    int bit = bits[(int)Math.Round((decimal)x/4) % bitCount];
+                    int bit = bits[(int)Math.Round((decimal)x/6) % bitCount];
 
                     int r = original.R;
                     int g = original.G;
@@ -110,9 +110,9 @@ namespace ConfidocLib
 
                     if (bit == 1)
                     {
-                        r = Math.Max(r-25, 0);
-                        g = Math.Max(g-25, 0);
-                        b = Math.Max(b-25, 0);
+                        r = Math.Max(r-10, 0);
+                        g = Math.Max(g-10, 0);
+                        b = Math.Max(b-10, 0);
                     }
 
                     input.SetPixel(

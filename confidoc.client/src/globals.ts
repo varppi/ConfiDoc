@@ -72,6 +72,16 @@ export function getConfig(): AxiosRequestConfig {
     }
 }
 
+export function getConfigMultipart(): AxiosRequestConfig {
+    const token = getToken();
+    return {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+        }
+    }
+}
+
 export function isLoggedIn(): boolean {
     return !(getToken() == null || getToken() == "");
 }
@@ -91,6 +101,23 @@ export function convertTicksToJs(ticks: number): Date {
     const jsTicks = (input - epochTicks) / ticksPerMillisecond;
     const jsDate = new Date(jsTicks); 
     return jsDate;
+}
+
+export function generateUniqueColor(string: string) {
+    let hash = 111111111;
+    let char;
+    if (string.length == 0) return hash;
+
+    for (let i = 0; i < string.length; i++) {
+        char = string.charCodeAt(i);
+        hash ^= Math.abs(char * hash);
+    }
+
+    const hashStr = `${Math.abs(hash)}`;
+    const min = (getTheme() == "light" ? 0 : 50);
+    const max = (getTheme() == "light" ? 175 : 255);
+    const final = `${(min + (parseInt(hashStr.substring(0, 3))) % (max - min))},${(min + (parseInt(hashStr.substring(3, 6))) % (max - min))},${(min + (parseInt(hashStr.substring(6, 9))) % (max - min))}`;
+    return final;
 }
 
 // Interfaces
